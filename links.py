@@ -7,6 +7,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 
+from google_auth import is_logged_in
 import google_drive
 
 app = Blueprint('links', __name__)
@@ -41,6 +42,8 @@ def refresh(to):
         except Exception as e:
             print(e)
             return make_response("Error reading links.", 500)
+    elif is_logged_in():
+        return 'Access Denied'
     return redirect('/login/_refresh')
     # return redirect('/login?redirect=_refresh')
 
@@ -51,6 +54,8 @@ def go(shortlink):
             return redirect(links[shortlink])
         else:
             return 'Link not found'
+    elif is_logged_in():
+        return 'Access Denied'
     return redirect(f'/login/{shortlink}')
     # return redirect(f'/login?redirect={shortlink}')
 
@@ -61,6 +66,8 @@ def preview(shortlink):
             return f'Points to <a href="{links[shortlink]}">{links[shortlink]}</a> by {authors[shortlink] if authors[shortlink] else "N/A"}'
         else:
             return 'Link not found'
+    elif is_logged_in():
+        return 'Access Denied'
     return redirect(f'/login/{shortlink}')
     # return redirect(f'/login?redirect={shortlink}')
 

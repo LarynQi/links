@@ -24,5 +24,6 @@ def find_files(filename, _id):
 def is_validated():
     if is_logged_in():
         res = find_files(os.environ.get('SHEET'), os.environ.get('SHEET_ID'))
+        print(res, res[1])
         return res and res[1]
     return False

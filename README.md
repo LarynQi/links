@@ -1,5 +1,7 @@
 # links
 
+A shortlink server inspired by CS61A's Link Servers ([links](https://github.com/Cal-CS-61A-Staff/links), [shortlinks](https://github.com/Cal-CS-61A-Staff/cs61a-apps/tree/master/shortlinks))
+
 ## Setup
 
 Create a virtualenv
