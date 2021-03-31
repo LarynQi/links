@@ -14,6 +14,10 @@ import google_drive
 
 app = Blueprint('links', __name__)
 
+if 'credentials.json' not in os.listdir():
+    from utils import gen_credentials
+    gen_credentials()
+
 gc = gspread.service_account(filename='credentials.json')
 
 links, authors = {}, {}
