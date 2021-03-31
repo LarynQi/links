@@ -64,7 +64,9 @@ def login(redirect):
     params = {'redirect': redirect}
     session = OAuth2Session(CLIENT_ID, CLIENT_SECRET, scope=AUTHORIZATION_SCOPE, redirect_uri=AUTH_REDIRECT_URI, state=urllib.parse.urlencode(params))
 
-    uri, state = session.authorization_url(AUTHORIZATION_URL)
+    # uri, state = session.authorization_url(AUTHORIZATION_URL)
+    uri, state = session.create_authorization_url(AUTHORIZATION_URL)
+
 
     flask.session[AUTH_STATE_KEY] = state
     flask.session.permanent = True
@@ -87,8 +89,12 @@ def google_auth_redirect():
 
     if req_state:
         state = urllib.parse.parse_qs(req_state)
+        print(state)
         if state:
-            if state["redirect"][0] != '_refresh':
+            go = state["redirect"][0]
+            if go != '_refresh':
+                if go == 'PREVIEW-secret':
+                    return flask.redirect(f'/_refresh/preview/{go.split("-")[1]}')
                 return flask.redirect(f'/_refresh/{state["redirect"][0]}', code=302)
             return flask.redirect(f'/_refresh', code=302)
     return flask.redirect(BASE_URI, code=302)

@@ -4,3 +4,4 @@ flask==1.1.1
 google-api-python-client==2.0.2
 google-auth
 authlib==0.11
+gunicorn

@@ -25,3 +25,6 @@ def index():
         user_info = google_auth.get_user_info()
         return '<div>You are currently logged in as ' + user_info['given_name'] + '</div><pre>' + json.dumps(user_info, indent=4) + '</pre>'
     return '<button onclick="window.location.href=\'\\login\';"> Login </button>'
+
+if __name__ == '__main__':
+    app.run(threaded=True, port=5000)

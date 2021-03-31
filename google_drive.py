@@ -2,6 +2,7 @@ import googleapiclient.discovery
 from google_auth import build_credentials, get_user_info, is_logged_in
 import flask
 import os
+import functools
 
 app = flask.Blueprint('google_drive', __name__)
 
@@ -27,3 +28,22 @@ def is_validated():
         print(res, res[1])
         return res and res[1]
     return False
+
+def validate(endpoint):
+    @functools.wraps(endpoint)
+    def inner(*args, **kwargs):
+        if is_validated():
+            return endpoint(*args, **kwargs)
+        elif is_logged_in():
+            return 'Access Denied'
+        name = endpoint.__name__
+        if 'shortlink' in kwargs and name == 'go':
+            return flask.redirect(f'/login/{kwargs["shortlink"]}')
+        elif name == 'refresh':
+            return flask.redirect(f'/login/_refresh')
+        elif 'shortlink' in kwargs and name == 'preview':
+            print("HERE", kwargs)
+            return flask.redirect(f'/login/PREVIEW-{kwargs["shortlink"]}')
+            # return flask.redirect()
+        return flask.redirect('/login')
+    return functools.update_wrapper(inner, endpoint)
