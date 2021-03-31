@@ -14,7 +14,6 @@ app = flask.Flask(__name__)
 
 app.secret_key = os.environ.get('FN_FLASK_SECRET_KEY', default=False)
 
-# https://www.mattbutton.com/2019/01/05/google-authentication-with-python-and-flask/
 app.register_blueprint(google_auth.app)
 app.register_blueprint(google_drive.app)
 app.register_blueprint(links.app)
@@ -23,7 +22,7 @@ app.register_blueprint(links.app)
 def index():
     if google_auth.is_logged_in():
         user_info = google_auth.get_user_info()
-        return '<div>You are currently logged in as ' + user_info['given_name'] + '</div><pre>' + json.dumps(user_info, indent=4) + '</pre>'
+        return '<div>You are currently logged in as ' + user_info['given_name'] + '</div><pre>' + json.dumps(user_info, indent=4) + '</pre>' + '<button onclick="window.location.href=\'\\logout\';"> Logout </button>'
     return '<button onclick="window.location.href=\'\\login\';"> Login </button>'
 
 if __name__ == '__main__':

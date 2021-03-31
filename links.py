@@ -20,7 +20,7 @@ if 'credentials.json' not in os.listdir():
 
 gc = gspread.service_account(filename='credentials.json')
 
-links, authors = {}, {}
+links, authors, dates = {}, {}, {}
 
 @app.route("/_refresh")
 def _refresh():
@@ -38,14 +38,16 @@ def preview_refresh(preview, to):
 @app.route("/_refresh/<to>")
 @validate
 def refresh(to):
-    temp_links, temp_authors = {}, {}
+    temp_links, temp_authors, temp_dates = {}, {}, {}
     try:
         gsheet = gc.open_by_key(os.environ.get('SHEET_ID'))
         for entry in gsheet.sheet1.get_all_records():
-            temp_links[entry['Shortlink']] = entry['URL']
-            temp_authors[entry['Shortlink']] = entry['Creator']
-        global links, authors
-        links, authors = temp_links, temp_authors
+            shortlink = entry['Shortlink']
+            temp_links[shortlink] = entry['URL']
+            temp_authors[shortlink] = entry['Creator']
+            temp_dates[shortlink] = entry['Date']
+        global links, authors, dates
+        links, authors, dates = temp_links, temp_authors, temp_dates
         if to:
             return redirect(f'/{to}', 301)
         return make_response("Links updated.", 200)
@@ -56,7 +58,6 @@ def refresh(to):
 @app.route('/<path:shortlink>')
 @google_drive.validate
 def go(shortlink):
-
     if shortlink in links:
         if links[shortlink]:
             return redirect(links[shortlink])
@@ -68,6 +69,6 @@ def go(shortlink):
 @validate
 def preview(shortlink):
     if shortlink in links:
-        return f'Points to <a href="{links[shortlink]}">{links[shortlink]}</a> by {authors[shortlink] if authors[shortlink] else "N/A"}'
+        return f'<div> Points to <a href="{links[shortlink]}">{links[shortlink]}</a></div> <div> Created by {authors[shortlink] if authors[shortlink] else "N/A"} on {dates[str(shortlink)] if dates[str(shortlink)] else "N/A"} </div>'
     else:
         return 'Link not found'

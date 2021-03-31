@@ -24,7 +24,7 @@ def find_files(filename, _id):
 
 def is_validated():
     if is_logged_in():
-        res = find_files(os.environ.get('SHEET'), os.environ.get('SHEET_ID'))
+        res = find_files(os.environ.get('SHEET_NAME'), os.environ.get('SHEET_ID'))
         print(res, res[1])
         return res and res[1]
     return False
@@ -42,8 +42,6 @@ def validate(endpoint):
         elif name == 'refresh':
             return flask.redirect(f'/login/_refresh')
         elif 'shortlink' in kwargs and name == 'preview':
-            print("HERE", kwargs)
             return flask.redirect(f'/login/PREVIEW-{kwargs["shortlink"]}')
-            # return flask.redirect()
         return flask.redirect('/login')
     return functools.update_wrapper(inner, endpoint)

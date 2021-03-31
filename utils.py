@@ -14,17 +14,6 @@ def gen_credentials():
     AUTH_PROVIDER = os.environ.get('AUTH_PROVIDER')
     CLIENT_CERT = os.environ.get('CLIENT_CERT')
 
-    # CRED_TYPE = 1
-    # PROJ_ID = 2
-    # KEY_ID = 3
-    # KEY = 5
-    # SERVICE_EMAIL = 4
-    # SERVICE_ID = 6
-    # AUTH_URI = 7
-    # TOKEN_URI = 8
-    # AUTH_PROVIDER = 9
-    # CLIENT_CERT = 10
-
     credentials = {
         "type": CRED_TYPE,
         "project_id": PROJ_ID,
@@ -44,13 +33,3 @@ def gen_credentials():
 
     with open('credentials.json', 'w') as f:
         json.dump(credentials, f, indent=2)
-
-        # f.write('{\n')
-        # count = 0
-        # for cred in json:
-        #     if count == len(json) - 1:
-        #         f.write(f'  "{cred}": "{json[cred]}"\n')
-        #     else:
-        #         f.write(f'  "{cred}": "{json[cred]}",\n')
-        #     count += 1
-        # f.write('}')
