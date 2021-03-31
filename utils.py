@@ -42,7 +42,7 @@ def gen_credentials():
 
     credentials["private_key"] = credentials["private_key"].replace(r'\n', '\n') 
 
-    with open('test.json', 'w') as f:
+    with open('credentials.json', 'w') as f:
         json.dump(credentials, f, indent=2)
 
         # f.write('{\n')
