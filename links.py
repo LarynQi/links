@@ -31,9 +31,9 @@ def _refresh():
 def preview_refresh(preview, to):
     if preview == 'preview':
         ref_res = refresh(to)
-        if ref_res.status_code == 301:
-            return redirect(f'/preview{ref_res.headers["Location"]}', 301)
-    return make_response("Invalid URL.", 500)
+        if ref_res.status_code == 307:
+            return redirect(f'/preview{ref_res.headers["Location"]}', code=302)
+    return make_response("Invalid URL", 404)
 
 @app.route("/_refresh/<to>")
 @validate
@@ -49,10 +49,15 @@ def refresh(to):
         global links, authors, dates
         links, authors, dates = temp_links, temp_authors, temp_dates
         if to:
-            return redirect(f'/{to}', 301)
+            return redirect(f'/{to}', 307)
         return make_response("Links updated.", 200)
+    except gspread.exceptions.APIError as e:
+        if e.response.status_code == 403:
+            return make_response(f'Please share {os.environ.get("SHEET_NAME")} with {os.environ.get("SERVICE_EMAIL")}.', 403) 
+        return make_response('Error reading links.', 500)
+    except KeyError as e:
+        return make_response(f'Please do not modify the column names on the spreadsheet', 403) 
     except Exception as e:
-        print(e)
         return make_response("Error reading links.", 500)
 
 @app.route('/<path:shortlink>')
@@ -61,9 +66,9 @@ def go(shortlink):
     if shortlink in links:
         if links[shortlink]:
             return redirect(links[shortlink])
-        return 'Link missing. Please follow the instructions on the spreadsheet.'
+        return make_response('Link missing. Please follow the instructions on the spreadsheet.', 403)
     else:
-        return 'Link not found'
+        return make_response('Link not found', 404)
 
 @app.route('/preview/<path:shortlink>')
 @validate
@@ -71,4 +76,4 @@ def preview(shortlink):
     if shortlink in links:
         return f'<div> Points to <a href="{links[shortlink]}">{links[shortlink]}</a></div> <div> Created by {authors[shortlink] if authors[shortlink] else "N/A"} on {dates[str(shortlink)] if dates[str(shortlink)] else "N/A"} </div>'
     else:
-        return 'Link not found'
+        return make_response('Link not found', 404)

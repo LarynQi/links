@@ -12,6 +12,8 @@ source env/bin/activate
 pip install -r requirements.txt
 ```
 
+_Developed and tested on Python 3.7.4_
+
 2. Environment variables
 
 <ins>Google Oauth & Flask App</ins>

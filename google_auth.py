@@ -50,7 +50,6 @@ def no_cache(view):
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '-1'
         return response
-
     return functools.update_wrapper(no_cache_impl, view)
 
 @app.route('/login')
@@ -61,10 +60,12 @@ def _login():
 @app.route('/login/<redirect>')
 @no_cache
 def login(redirect):
+    query = urllib.parse.urlparse(flask.request.url).query
+    qs = urllib.parse.parse_qs(query)
     params = {'redirect': redirect}
+    params.update(qs)
     session = OAuth2Session(CLIENT_ID, CLIENT_SECRET, scope=AUTHORIZATION_SCOPE, redirect_uri=AUTH_REDIRECT_URI, state=urllib.parse.urlencode(params))
 
-    # uri, state = session.authorization_url(AUTHORIZATION_URL)
     uri, state = session.create_authorization_url(AUTHORIZATION_URL)
 
     flask.session[AUTH_STATE_KEY] = state
@@ -88,21 +89,30 @@ def google_auth_redirect():
 
     if req_state:
         state = urllib.parse.parse_qs(req_state)
-        print(state)
         if state:
-            go = state["redirect"][0]
-            if go != '_refresh':
-                if go == 'PREVIEW-secret':
-                    return flask.redirect(f'/_refresh/preview/{go.split("-")[1]}')
-                return flask.redirect(f'/_refresh/{state["redirect"][0]}', code=302)
-            return flask.redirect(f'/_refresh', code=302)
+            if "redirect" in state:
+                go = state["redirect"][0]
+                if go != '_refresh':
+                    if "preview" in state:
+                        if "True" in state["preview"][0]:
+                            return flask.redirect(f'/_refresh/preview/{go}', code=302)
+                    return flask.redirect(f'/_refresh/{go}', code=302)
+                return flask.redirect(f'/_refresh', code=302)
+            print("Unexpected state", state)        
     return flask.redirect(BASE_URI, code=302)
 
 
 @app.route('/logout')
 @no_cache
 def logout():
-    flask.session.pop(AUTH_TOKEN_KEY, None)
-    flask.session.pop(AUTH_STATE_KEY, None)
+    key = flask.request.args.get('key', None)
+    if key == keys.get(flask.request.cookies.get('session').split('.')[0], 1):
+        flask.session.pop(AUTH_TOKEN_KEY, None)
+        flask.session.pop(AUTH_STATE_KEY, None)
+        return flask.redirect(BASE_URI, code=302)
+    return flask.make_response('Access Denied', 403)
 
-    return flask.redirect(BASE_URI, code=302)
+keys = {}
+
+def recv_key(cookie, key):
+    keys[cookie.split('.')[0]] = key

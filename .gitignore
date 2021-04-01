@@ -2,6 +2,10 @@ __pycache__
 env
 run.sh
 *.json
-DS_Store
+.DS_Store
 public.py
 private.py
+.env
+.hack
+hack/
+templates/
