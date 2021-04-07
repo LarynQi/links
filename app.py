@@ -11,6 +11,7 @@ import google_drive
 import links
 
 from flask_wtf.csrf import CSRFProtect
+from flask_talisman import Talisman
 
 import secrets
 
@@ -36,6 +37,15 @@ def index():
 
 csrf = CSRFProtect()
 csrf.init_app(app)
+
+SELF = "'self'"
+
+csp = {
+    'default-src': SELF,
+    'img-src': '*'
+}
+
+Talisman(app, content_security_policy=csp)
 
 if __name__ == '__main__':
     app.run(threaded=True, port=5000)

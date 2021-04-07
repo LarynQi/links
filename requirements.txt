@@ -6,3 +6,4 @@ google-auth==1.28.0
 authlib==0.11
 gunicorn==20.1.0
 flask_wtf==0.14.3
+flask-talisman==0.7.0
