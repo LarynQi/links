@@ -61,13 +61,16 @@ def refresh(to):
         return make_response("Error reading links.", 500)
 
 @app.route('/<path:shortlink>')
-@google_drive.validate
+@validate
 def go(shortlink):
     if shortlink in links:
         if links[shortlink]:
-            return redirect(links[shortlink])
+            return redirect(links[shortlink], 302)
         return make_response('Link missing. Please follow the instructions on the spreadsheet.', 403)
     else:
+        refresh('')
+        if shortlink in links:
+            return go(shortlink)
         return make_response('Link not found', 404)
 
 @app.route('/preview/<path:shortlink>')
@@ -76,4 +79,7 @@ def preview(shortlink):
     if shortlink in links:
         return f'<div> Points to <a href="{links[shortlink]}">{links[shortlink]}</a></div> <div> Created by {authors[shortlink] if authors[shortlink] else "N/A"} on {dates[str(shortlink)] if dates[str(shortlink)] else "N/A"} </div>'
     else:
+        refresh('')
+        if shortlink in links:
+            return preview(shortlink)
         return make_response('Link not found', 404)
