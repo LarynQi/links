@@ -106,7 +106,9 @@ def google_auth_redirect():
 @no_cache
 def logout():
     key = flask.request.args.get('key', None)
-    if key == keys.get(flask.request.cookies.get('session').split('.')[0], 1):
+    cookie = flask.request.cookies.get('session').split('.')[1]
+    if key == keys.get(cookie, 1):
+        keys.pop(cookie)
         flask.session.pop(AUTH_TOKEN_KEY, None)
         flask.session.pop(AUTH_STATE_KEY, None)
         return flask.redirect(BASE_URI, code=302)
@@ -115,4 +117,4 @@ def logout():
 keys = {}
 
 def recv_key(cookie, key):
-    keys[cookie.split('.')[0]] = key
+    keys[cookie.split('.')[1]] = key

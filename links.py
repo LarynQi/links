@@ -31,7 +31,7 @@ def _refresh():
 def preview_refresh(preview, to):
     if preview == 'preview':
         ref_res = refresh(to)
-        if ref_res.status_code == 307:
+        if ref_res.status_code == 302:
             return redirect(f'/preview{ref_res.headers["Location"]}', code=302)
     return make_response("Invalid URL", 404)
 
@@ -49,7 +49,7 @@ def refresh(to):
         global links, authors, dates
         links, authors, dates = temp_links, temp_authors, temp_dates
         if to:
-            return redirect(f'/{to}', 307)
+            return redirect(f'/{to}', 302)
         return make_response("Links updated.", 200)
     except gspread.exceptions.APIError as e:
         if e.response.status_code == 403:
