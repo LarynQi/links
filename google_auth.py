@@ -45,7 +45,7 @@ def get_user_info():
 def no_cache(view):
     @functools.wraps(view)
     def no_cache_impl(*args, **kwargs):
-        response = flask.make_response(view(*args, **kwargs))
+        response = flask.make_response(view(*args, **kwargs), code=300)
         response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '-1'
