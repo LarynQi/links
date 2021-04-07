@@ -42,7 +42,8 @@ SELF = "'self'"
 
 csp = {
     'default-src': SELF,
-    'img-src': '*'
+    'img-src': '*',
+    'script-src': [SELF, '\'unsafe-inline\'']
 }
 
 Talisman(app, content_security_policy=csp)
