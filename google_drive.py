@@ -34,7 +34,7 @@ def validate(endpoint):
         if is_validated():
             return endpoint(*args, **kwargs)
         elif is_logged_in():
-            return flask.make_response('Access Denied', code=403)
+            return flask.make_response('Access Denied', 403)
         name = endpoint.__name__
         if 'shortlink' in kwargs and name == 'go':
             return flask.redirect(f'/login/{kwargs["shortlink"]}', code=302)
